@@ -1,11 +1,11 @@
 module DatabaseCommunication {
-
+    
     /* 
     This class helps in the creation of SQL queries and statements.
     Something like `PreparedStatement` used by the JDBC in Java.
     Useful for ensuring proper datatypes and prevention of SQL injection.
 
-    For example: SELECT name FROM USERS WHERE name = ?1 and address = ?2
+    For example: SELECT id FROM USERS WHERE name = ?1 and address = ?2
     The `?1` and `?2` placeholders can be replaced with setValue.
     */
     class Statement {
@@ -48,19 +48,15 @@ module DatabaseCommunication {
             // If so, warn the user or throw an error.
             return this._finalStatement;
         }
-
-        proc writeThis() {
-            writeln(this._finalStatement);
-        }
     }
 
     /*** Intefaces: ***/
 
     /*
-    The `Cursor` class provides an interface that needs to be
+    The `ICursor` class provides an interface that needs to be
     implemented by all database cursor classes.
     */
-    class Cursor {
+    class ICursor {
         proc execute(stmt: Statement) {}
         proc executeBatch(stmts: [?D] Statement) {}
         proc query(stmt: Statement) {}
@@ -70,10 +66,10 @@ module DatabaseCommunication {
     }
 
     /*
-    The `Connection` class provides an interface that needs to be
+    The `IConnection` class provides an interface that needs to be
     implemented by all database connector classes.
     */
-    class Connection {
+    class IConnection {
         proc cursor(): Cursor {}
         proc commit() {}
         proc rollback() {}
