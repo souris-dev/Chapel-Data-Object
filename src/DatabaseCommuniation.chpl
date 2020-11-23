@@ -1,9 +1,49 @@
 module DatabaseCommunication {
 
+    /*** Intefaces: ***/
+
+    /*
+    The `ICursor` class provides an interface that needs to be
+    implemented by all database cursor classes.
+    */
+    class ICursor {
+        proc execute(stmt: Statement) {}
+        proc executeBatch(stmts: [?D] Statement) {}
+        proc query(stmt: Statement) {}
+        proc fetchone() {}
+        proc fetchall() {}
+        proc fetchManyIter() {}
+        proc close() {}
+    }
+
+    /*
+    The `IConnection` class provides an interface that needs to be
+    implemented by all database connector classes.
+    */
+    class IConnection {
+        proc cursor(): Cursor {}
+        proc close() {}
+        proc setAutoCommit(autocommit: bool) {}
+        proc isAutocommit(): bool {}
+        proc rollback(): bool {}
+
+        proc getNativeConnection(): opaque {
+            // TODO: ref intent instead of opaque?
+            return nil;
+        }
+
+        proc beginTransaction() {}
+        proc commit() {}
+        proc rollback() {}
+    }
+
+    
+    /*** Quey Building ***/
+
     /* 
-    This class helps in the creation of SQL queries and statements.
-    Something like `PreparedStatement` used by the JDBC in Java.
-    Useful for ensuring proper datatypes and prevention of SQL injection.
+    This class helps in the creation of SQL queries and statements,
+    something like `PreparedStatement` used by the JDBC in Java.
+    Useful for ensuring proper data types and prevention of SQL injection.
 
     For example: `SELECT id FROM USERS WHERE name = ?1 and address = ?2`
     The `?1` and `?2` placeholders can be replaced with setValue.
@@ -18,10 +58,11 @@ module DatabaseCommunication {
         var _finalStatement: string;
 
         /*
-        :arg statement: The SQL statement
-        :type statement: string
-        :arg toSubstitue: True if the arg `statement` contains placeholder question marks to be substituted
-        :type toSubstitue: bool
+        Initialize an SQL statement.
+            :arg statement: The SQL statement
+            :type statement: string
+            :arg toSubstitue: True if the arg `statement` contains placeholder question marks to be substituted
+            :type toSubstitue: bool
         */
         
         proc init(statement: string, toSubstitute: bool) {
@@ -36,9 +77,10 @@ module DatabaseCommunication {
         }
 
         /*
-        :arg at: The placeholder index to substitute the value at (e.g.: for `?2`, the value of `at` is 2)
-        :type at: int
-        :arg value: The value to substitute at the placeholder index `at`
+        Set the value of a placeholder.
+            :arg at: The placeholder index to substitute the value at (e.g.: for `?2`, the value of `at` is 2)
+            :type at: int
+            :arg value: The value to substitute at the placeholder index `at`
         */
 
         proc setValue(at: int, value: ?t) {
@@ -58,10 +100,14 @@ module DatabaseCommunication {
 
             // conserve the space
             this._finalStatement = this._statementUnformatted.replace(" ?" + at: string, " " + toBeReplacedWith);
+
+            // TODO: add escapes for symbols
         }
 
         /*
         Checks if any placeholder remains to be substituted in the SQL statement.
+            :return: if any placeholders are yet to be substituted
+            :rtype: bool
         */
 
         proc isPlaceholderRemaining(): bool {
@@ -69,6 +115,11 @@ module DatabaseCommunication {
             return true;
         }
 
+        /*
+        Returns the substituted, final SQL statement/query.
+            :return: final substituted SQL statement/query
+            :rtype: string
+        */
         proc getSubstitutedStatement(): string {
             // TODO: Add a check to ensure no placeholders are unsubstituted
             // If so, warn the user or throw an error.
@@ -80,34 +131,15 @@ module DatabaseCommunication {
         }
     }
 
-    /*** Intefaces: ***/
-
-    /*
-    The `ICursor` class provides an interface that needs to be
-    implemented by all database cursor classes.
-    */
-    class ICursor {
-        proc execute(stmt: Statement) {}
-        proc executeBatch(stmts: [?D] Statement) {}
-        proc query(stmt: Statement) {}
-        proc fetchone() {}
-        proc fetchall() {}
-        proc fetchManyIter() {}
-    }
-
-    /*
-    The `IConnection` class provides an interface that needs to be
-    implemented by all database connector classes.
-    */
-    class IConnection {
-        proc cursor(): Cursor {}
-        proc commit() {}
-        proc rollback() {}
-        proc close() {}
-        proc setAutocommit(autoCommit: bool) {}
-    }
-
+    
     /*** Errors ***/
+
+    /*
+    Class for connection errors.
+    */
+    class DBConnectionFailedError : Error {
+        proc init() {}
+    }
 
     /*
     This is the base class for al SQL statement errors.
