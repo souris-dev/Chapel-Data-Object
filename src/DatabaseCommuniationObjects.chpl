@@ -1,19 +1,49 @@
-module DatabaseCommunication {
+module DatabaseCommunicationObjects {
+    use Map;
 
     /*** Intefaces: ***/
+
+    /*
+    The base class for a row  of the returned result.
+    This class needs to be implemented by all row classes.
+    */
+    class IRow {
+        // Let's have a JDBC approach here
+        // because we can't have heterogenous types in a map
+        
+        proc getValAsType(fieldNumber: int(32), type t) {}
+        proc getValAsType(fieldName: string, type t) {}
+
+        proc getVal(fieldNumber: int(32)): string {}
+        proc getVal(fieldName: string): string {}
+    }
+
+    /*
+    The base class for a field of the returned result.
+    This class needs to be implemented by all field info classes.
+    */
+    class IField {
+        proc getFieldType(): string {}
+        proc getFieldNumber(): int(32) {} // TODO: rename to getFieldIndex() ?
+        proc getFieldName(): string {}
+    }
 
     /*
     The `ICursor` class provides an interface that needs to be
     implemented by all database cursor classes.
     */
     class ICursor {
-        proc execute(stmt: Statement) {}
-        proc executeBatch(stmts: [?D] Statement) {}
-        proc query(stmt: Statement) {}
+        proc execute(statement: Statement) {}
+        proc executeBatch(statements: [?D] Statement) {}
+        proc query(statement: Statement) {}
         proc fetchone() {}
         proc fetchall() {}
-        proc fetchManyIter() {}
         proc close() {}
+
+        proc __resetFields() {}
+        proc __addField() {}
+        proc getFieldInfo(fieldNumberInResult: int(32)): IField {}
+        proc hasColumnWithName(name: string): bool {}
     }
 
     /*
@@ -21,7 +51,8 @@ module DatabaseCommunication {
     implemented by all database connector classes.
     */
     class IConnection {
-        proc cursor(): Cursor {}
+        proc connect(connectionString: string, autocommit: bool = true) {}
+        proc cursor(): ICursor {}
         proc close() {}
         proc setAutoCommit(autocommit: bool) {}
         proc isAutocommit(): bool {}
@@ -96,7 +127,7 @@ module DatabaseCommunication {
             else {
                 toBeReplacedWith = "'" + value: string + "'";
             }
-            // TODO add more types
+            // TODO add more types like date
 
             // conserve the space
             this._finalStatement = this._statementUnformatted.replace(" ?" + at: string, " " + toBeReplacedWith);
@@ -135,9 +166,31 @@ module DatabaseCommunication {
     /*** Errors ***/
 
     /*
+    Thrown when user tries to perform an operation on a
+    connection that is not connected.
+    */
+    class NotConnectedError : Error {
+        proc init() {}
+    }
+
+    /*
+    Class for wrong connection string format or parameters.
+    */
+    class ConnectionStringFormatError : Error {
+        proc init() {}
+    }
+
+    /*
     Class for connection errors.
     */
     class DBConnectionFailedError : Error {
+        proc init() {}
+    }
+
+    /*
+    Class for failure of SQL statement execution.
+    */
+    class QueryExecutionError : Error {
         proc init() {}
     }
 
