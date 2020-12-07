@@ -5,6 +5,7 @@ module MySQLNative {
 
     extern type enum_session_state_type = int(32);
     extern type mysql_enum_shutdown_level = int(32);
+    extern type enum_field_types = int(32);
     extern type enum_mysql_set_option = int(32);
     extern type enum_stmt_attr_type = int(32);
     extern type mysql_option;

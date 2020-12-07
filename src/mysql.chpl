@@ -273,15 +273,22 @@ module MySQL {
     */
     class MySQLRow : IRow {
 
-        // TODO: use map
+        // Note: the problem here is that we can't use one single function
+        // to return values of different types I guess (can we?)
+        // Because of this, even if we know th field type, we cannot really
+        // convert the value to that type and return it
+        // because that would mean returning different types for different fields
 
         pragma "no doc"
-        var _row: MYSQL_ROW;
-        var _fields: c_ptr(MYSQL_FIELD);
+        var _cptr_row: MYSQL_ROW;
+        var _cptr_fields: c_ptr(MYSQL_FIELD);
+        var _fieldTypes: string;
 
-        proc init(mysqlrow: MYSQL_ROW, fields: c_ptr(MYSQL_FIELD)) {
-            this._row = mysqlrow;
-            this._fields = fields;
+        proc init(mysqlrow: MYSQL_ROW, cfields: c_ptr(MYSQL_FIELD)) {
+            this._cptr_row = mysqlrow;
+            this._cptr_fields = fields;
+
+            // TODO: init _fieldTypes here
         }
 
         /*
@@ -298,7 +305,7 @@ module MySQL {
             :rtype: t
         */
         override proc getValAsType(fieldNumber: int(32), type t) {
-            var fieldVal: string = createStringWithNewBuffer(__get_mysql_field_val_by_number(this._row, fieldNumber));
+            var fieldVal: string = createStringWithNewBuffer(__get_mysql_field_val_by_number(this._cptr_row, fieldNumber));
             return fieldVal: t;
         }
 
@@ -316,21 +323,23 @@ module MySQL {
             :rtype: t
         */
         override proc getValAsType(fieldName: string, type t) {
-            var fieldVal: string = createStringWithNewBuffer(__get_mysql_field_val_by_name(this._row, 
-                                                                                           this._fields, 
+            var fieldVal: string = createStringWithNewBuffer(__get_mysql_field_val_by_name(this._cptr_row, 
+                                                                                           this._cptr_fields, 
                                                                                            fieldName.localize().c_str()));
             return fieldVal: t;
         }
 
         override proc getVal(fieldNumber: int(32)): string {
-            return createStringWithNewBuffer(__get_mysql_field_val_by_number(this._row, fieldNumber));
+            return createStringWithNewBuffer(__get_mysql_field_val_by_number(this._cptr_row, fieldNumber));
         }
 
         override proc getVal(fieldName: string): string {
-            return createStringWithNewBuffer(__get_mysql_field_val_by_name(this._row, 
-                                                                           this._fields, 
+            return createStringWithNewBuffer(__get_mysql_field_val_by_name(this._cptr_row, 
+                                                                           this._cptr_fields, 
                                                                            fieldName.localize().c_str()));
         }
+
+        
     }
 
     /*
@@ -352,6 +361,12 @@ module MySQL {
             this._conn = connctn;
             this._cptr_mysqlconn = mysqlconn;
             this.complete();
+
+            this._curRow = 0;
+            this._nRows = 0;
+            this._nFields = 0;
+            this._cptr_result = nil;
+            this._cptr_fields = nil;
         }
 
         /*
@@ -405,11 +420,6 @@ module MySQL {
             else if ((this._cptr_result != c_nil) && (mysql_errno(this._cptr_mysqlconn) != 0)) {
                 this._nFields = mysql_num_fields(this._cptr_result): int(32);
                 this._cptr_fields = mysql_fetch_fields(this._cptr_result);
-
-                for fieldNumber in 0..(this._nFields - 1) {
-                    // TODO: store the fields (their number, name and type)
-                    // in the map
-                }
             }
         }
 
@@ -441,12 +451,61 @@ module MySQL {
                 this.commit();
             }
         }
-    }
 
-    /*
-    Fetches the next row of the result set.
-    */
-    override proc fetchone(): owned MySQLRow {
+        /*
+        Fetches the next row of the result set.
+        Returns nil if there is no next row.
+        */
+        override proc fetchone(): owned MySQLRow {
+            var nextRow: MYSQL_ROW = mysql_fetch_row(this._cptr_result);
+            if (nextRow == c_nil || this._curRow >= this._nRows) {
+                return nil;
+            }
+
+            this._curRow += 1;
+
+            // init the row:
+            var _row = new MySQLRow(nextRow, this._cptr_fields);
+            
+            return _row;
+        }
+
+        /*
+        Fetches the next given number of rows in the result one by one,
+        returning an iterator.
+        Throws Error if howManyRows is negative.
+
+            :args howManyRows: how many rows to return
+            :type howManyRows: int(32)
+        */
+        override iter fetchsome(howManyRows: int(32)): owned MySQLRow {
+            if (howManyRows < 0) {
+                writeln("[Error] MySQLCursor.fetchsome(howManyRows) called with howManyRows < 0");
+                throw new Error();
+            }
+
+            else {
+                var counter = 0;
+                var _row = this.fetchone();
+
+                while (_row != nil && counter < this._nRows && counter < howManyRows) {
+                    yield _row;
+                    _row = this.fetchone();
+                    counter += 1;
+                }
+            }
+        }
+
+        /*
+        Fetches all the (remaining) rows in the result, returning an iterator.
+        */
+        override iter fetchall(): owned MySQLRow {
+            var _row = this.fetchone();
+            while (_row != nil) {
+                yield _row;
+                _row = this.fetchone();
+            }
+        }
 
     }
 }
