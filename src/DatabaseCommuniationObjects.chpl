@@ -37,7 +37,8 @@ module DatabaseCommunicationObjects {
         proc executeBatch(statements: [?D] Statement) {}
         proc query(statement: Statement) {}
         proc fetchone() {}
-        proc fetchall() {}
+        iter fetchsome(howManyRows: int(32)) {}
+        iter fetchall() {}
         proc close() {}
 
         proc __resetFields() {}
