@@ -329,17 +329,35 @@ module MySQL {
             return fieldVal: t;
         }
 
+        /*
+        Returns the value at the specified field as a string.
+
+            :arg fieldNumber: the value at the fieldNumber-th field will be returned (starts from 0)
+            :type fieldNumber: int(32)
+        */
         override proc getVal(fieldNumber: int(32)): string {
             return createStringWithNewBuffer(__get_mysql_field_val_by_number(this._cptr_row, fieldNumber));
         }
 
+        /*
+        Returns the value at the specified field (with field name given) as a string.
+
+            :arg fieldName: the value for the field fieldName wil be returned
+            :type fieldName: string
+        */
         override proc getVal(fieldName: string): string {
             return createStringWithNewBuffer(__get_mysql_field_val_by_name(this._cptr_row, 
                                                                            this._cptr_fields, 
                                                                            fieldName.localize().c_str()));
         }
 
-        
+        proc this(fieldNumber: int(32)): string {
+            return this.getVal(fieldNumber);
+        }
+
+        proc this(fieldName: string): string {
+            return this.getVal(fieldName);
+        }
     }
 
     /*
@@ -507,5 +525,22 @@ module MySQL {
             }
         }
 
+        /*
+        Fetches the nth row in the result set. Sets the seek at that row as well.
+            :arg rowIdx: the row to fetch (starts from 0)
+            :type rowIdx: int(32)
+        */
+        override iter fetchrow(rowIdx: int(32)): owned MySQLRow {
+            if (rowIdx >= this._nRows) {
+                return nil;
+            }
+
+            this._curRow = rowIdx;
+            mysql_data_seel(this._cptr_result, rowIdx: c_int);
+
+            var row = this.fetchone();
+
+            return row;
+        }
     }
 }
