@@ -1,4 +1,7 @@
 module MySQLNative {
+    use SysCTypes;
+    use CPtr;
+
     extern type char = int(8);
 
     extern type my_bool = int(8);
@@ -561,7 +564,7 @@ module MySQLNative {
 
     // Helpers defined in mysql_helper.c 
     pragma "no doc"
-    extern proc __get_mysql_field_val_by_number(row: MYSQL_ROW, idx: c_int): c_string;
+    extern proc __get_mysql_field_val_by_number(in row: MYSQL_ROW, idx: c_int): c_string;
 
     pragma "no doc"
     extern proc __get_mysql_field_name_by_number(fields: c_ptr(MYSQL_FIELD), idx: c_int): c_string;
@@ -570,5 +573,5 @@ module MySQLNative {
     extern proc __get_mysql_field_number_by_name(fields: c_ptr(MYSQL_FIELD), fieldName: c_string): int(32);
 
     pragma "no doc"
-    extern proc __get_mysql_field_val_by_name(row: MYSQL_ROW, fields: c_ptr(MYSQL_FIELD), fieldName: c_string): c_string;
+    extern proc __get_mysql_field_val_by_name(in row: MYSQL_ROW, fields: c_ptr(MYSQL_FIELD), fieldName: c_string): c_string;
 } // MySQLNative
