@@ -73,7 +73,7 @@ module DatabaseCommunicationObjects {
     /*** Quey Building ***/
 
     /* 
-    This class helps in the creation of SQL queries and statements,
+    This record helps in the creation of SQL queries and statements,
     something like `PreparedStatement` used by the JDBC in Java.
     Useful for ensuring proper data types and prevention of SQL injection.
 
@@ -84,7 +84,7 @@ module DatabaseCommunicationObjects {
     Hence, for `SELECT id FROM USERS WHERE name =?1 and address = ?2`
     `?1` will not be recognized as a placeholder but `?2` will be.
     */
-    class Statement {
+    record Statement {
         var _statementUnformatted: string;
         var _toSubstitute: bool;
         var _finalStatement: string;
@@ -155,6 +155,9 @@ module DatabaseCommunicationObjects {
         proc getSubstitutedStatement(): string {
             // TODO: Add a check to ensure no placeholders are unsubstituted
             // If so, warn the user or throw an error.
+            if (!this._toSubstitute) {
+                return this._finalStatement;
+            }
 
             if (this.isPlaceholderRemaining()) {
                 throw new IncompleteStatementError();
