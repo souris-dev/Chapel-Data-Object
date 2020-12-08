@@ -53,11 +53,11 @@ module DatabaseCommunicationObjects {
     */
     class IConnection {
         proc connect(connectionString: string, autocommit: bool = true) {}
-        proc cursor(): ICursor {}
+        proc cursor(): ICursor {return nil;}
         proc close() {}
-        proc setAutoCommit(autocommit: bool) {}
-        proc isAutocommit(): bool {}
-        proc rollback(): bool {}
+        proc setAutocommit(autocommit: bool) {}
+        proc isAutocommit(): bool {return nil;}
+        proc rollback(): bool {return nil;}
 
         proc getNativeConnection(): opaque {
             // TODO: ref intent instead of opaque?
@@ -97,9 +97,9 @@ module DatabaseCommunicationObjects {
             :type toSubstitue: bool
         */
         
-        proc init(statement: string, toSubstitute: bool) {
+        proc init(statement: string, toSubstitute: bool = false) {
+            this._statementUnformatted = statement;
             this._toSubstitute = toSubstitute;
-            this._statementUnformatted = unsubstitutedStatement;
             if (!toSubstitute) {
                 this._finalStatement = statement;
             }
@@ -211,6 +211,13 @@ module DatabaseCommunicationObjects {
     SQL statement or query, or tries to use it somewhere else.
     */
     class IncompleteStatementError : SQLStatementError {
+        proc init() {}
+    }
+
+    /*
+    Thrown when methods are called on an invalid row.
+    */
+    class InvalidRowError : Error {
         proc init() {}
     }
 }
