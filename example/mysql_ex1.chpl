@@ -4,7 +4,7 @@ module Main {
     use MySQL;
     use Map;
 
-    proc main() {
+    proc main() throws {
         var conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;root;root");
         var cursor = conHandler.cursor();
 
