@@ -33,7 +33,7 @@ module DatabaseCommunicationObjects {
     implemented by all database cursor classes.
     */
     class ICursor {
-        proc execute(statement: Statement) {}
+        proc execute(statement: Statement) throws {}
         proc executeBatch(statements: [?D] Statement) {}
         proc query(statement: Statement) {}
         proc fetchone() {}
@@ -52,7 +52,7 @@ module DatabaseCommunicationObjects {
     implemented by all database connector classes.
     */
     class IConnection {
-        proc connect(connectionString: string, autocommit: bool = true) {}
+        proc connect(connectionString: string, autocommit: bool = true) throws {}
         proc cursor(): ICursor {return nil;}
         proc close() {}
         proc setAutocommit(autocommit: bool) {}
@@ -152,7 +152,7 @@ module DatabaseCommunicationObjects {
             :return: final substituted SQL statement/query
             :rtype: string
         */
-        proc getSubstitutedStatement(): string {
+        proc getSubstitutedStatement(): string throws {
             // TODO: Add a check to ensure no placeholders are unsubstituted
             // If so, warn the user or throw an error.
             if (!this._toSubstitute) {

@@ -31,7 +31,7 @@ module MySQL {
             :arg autocommit: whether to turn on autocommit
             :type autocommit: bool
         */
-        override proc connect(connectionString: string, autocommit: bool = true) {
+        override proc connect(connectionString: string, autocommit: bool = true) throws {
             // TODO: check the connection string properly
 
             var host: string;
@@ -359,7 +359,7 @@ module MySQL {
             :arg fieldNumber: the value at the fieldNumber-th field will be returned (starts from 0)
             :type fieldNumber: int(32)
         */
-        override proc getVal(fieldNumber: int(32)): string {
+        override proc getVal(fieldNumber: int(32)): string throws {
             if (!this.isValid()) {
                 throw new InvalidRowError();
             }
@@ -381,14 +381,14 @@ module MySQL {
                                                                            fieldName.localize().c_str()));
         }
 
-        proc this(fieldNumber: int(32)): string {
+        proc this(fieldNumber: int(32)): string throws {
             if (!this.isValid()) {
                 throw new InvalidRowError();
             }
             return this.getVal(fieldNumber);
         }
 
-        proc this(fieldName: string): string {
+        proc this(fieldName: string): string throws {
             if (!this.isValid()) {
                 throw new InvalidRowError();
             }
@@ -447,7 +447,7 @@ module MySQL {
             :arg statement: the SQL statement to execute, an instance of Statement
             :type statement: instance of :class:`Statement` class
         */
-        override proc execute(statement: Statement) {
+        override proc execute(statement: Statement) throws {
             var sqlStatement: string = statement.getSubstitutedStatement();
 
             if (mysql_query(this._cptr_mysqlconn, sqlStatement.localize().c_str())) {
