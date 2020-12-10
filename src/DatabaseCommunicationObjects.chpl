@@ -100,12 +100,7 @@ module DatabaseCommunicationObjects {
         proc init(statement: string, toSubstitute: bool = false) {
             this._statementUnformatted = statement;
             this._toSubstitute = toSubstitute;
-            if (!toSubstitute) {
-                this._finalStatement = statement;
-            }
-            else {
-                this._finalStatement = "";
-            }
+            this._finalStatement = statement;
         }
 
         /*
@@ -117,9 +112,9 @@ module DatabaseCommunicationObjects {
 
         proc setValue(at: int, value: ?t) {
             var toBeReplacedWith: string;
-
+            writeln("Requested replace at: ", at: string, " with: ", value: string);
             // TODO: add tests for SQL injection
-            if (t == int) {
+            if (t == int(64) || t == int(32) || t == int) {
                 toBeReplacedWith = value: string;
             }
             else if (t == bool) {
@@ -131,8 +126,7 @@ module DatabaseCommunicationObjects {
             // TODO add more types like date
 
             // conserve the space
-            this._finalStatement = this._statementUnformatted.replace(" ?" + at: string, " " + toBeReplacedWith);
-
+            this._finalStatement = this._finalStatement.replace(" ?" + at: string, " " + toBeReplacedWith);
             // TODO: add escapes for symbols
         }
 
@@ -144,7 +138,7 @@ module DatabaseCommunicationObjects {
 
         proc isPlaceholderRemaining(): bool {
             // TODO: to be implemented
-            return true;
+            return false;
         }
 
         /*
