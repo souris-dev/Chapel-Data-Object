@@ -1,0 +1,10 @@
+
+[brick]
+name = "DatabaseCommunicationObjects"
+version = "0.1.0"
+chplVersion = "1.23.0"
+license = "Apache License 2.0"
+
+[dependencies]
+
+
