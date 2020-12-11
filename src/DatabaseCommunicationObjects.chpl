@@ -88,6 +88,7 @@ module DatabaseCommunicationObjects {
         var _statementUnformatted: string;
         var _toSubstitute: bool;
         var _finalStatement: string;
+        var _placeholderRemains: bool;
 
         /*
         Initialize an SQL statement.
@@ -101,6 +102,7 @@ module DatabaseCommunicationObjects {
             this._statementUnformatted = statement;
             this._toSubstitute = toSubstitute;
             this._finalStatement = statement;
+            this._placeholderRemains = toSubstitute;
         }
 
         /*
@@ -111,8 +113,11 @@ module DatabaseCommunicationObjects {
         */
 
         proc setValue(at: int, value: ?t) {
+            if (!this._toSubstitute) {
+                return;
+            }
+
             var toBeReplacedWith: string;
-            writeln("Requested replace at: ", at: string, " with: ", value: string);
             // TODO: add tests for SQL injection
             if (t == int(64) || t == int(32) || t == int) {
                 toBeReplacedWith = value: string;
@@ -137,7 +142,20 @@ module DatabaseCommunicationObjects {
         */
 
         proc isPlaceholderRemaining(): bool {
-            // TODO: to be implemented
+            // Skip the check if we've previosuly checked that there's none left
+            if (!this._placeholderRemains) {
+                return false;
+            }
+
+            // Checks if there is any pattern like: "<space>?<digit>" in the string
+            for (i, char) in zip(0.., this._finalStatement) {
+                if (char == "?" && i > 0 && this._finalStatement[i - 1].isSpace()) {
+                    if (i < this._finalStatement.size - 1 && this._finalStatement[i + 1].isDigit()) {
+                        return true;
+                    }
+                }
+            }
+            this._placeholderRemains = false;
             return false;
         }
 
