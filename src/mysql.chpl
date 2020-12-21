@@ -67,12 +67,12 @@ module MySQL {
                                                             c_nil: c_string, 0);
 
             if (conn_res == c_nil) {
-                writeln("Unable to connect to database!");
+                writeln("[Error] Unable to connect to database!");
                 mysql_close(this._cptr_mysqlconn);
                 throw new DBConnectionFailedError();
             }
 
-            this.setAutocommit(true);
+            this.setAutocommit(autocommit);
             this._connected = true;
         } 
 
@@ -280,7 +280,7 @@ module MySQL {
 
         // Note: the problem here is that we can't use one single function
         // to return values of different types I guess (can we?)
-        // Because of this, even if we know th field type, we cannot really
+        // Because of this, even if we know the field type, we cannot really
         // convert the value to that type and return it
         // because that would mean returning different types for different fields
 
@@ -407,7 +407,7 @@ module MySQL {
         var _cptr_result: c_ptr(MYSQL_RES);
         var _cptr_fields: c_ptr(MYSQL_FIELD);
         var _curRow: int(32) = 0;
-        var _nRows: int(32);
+        var _nRows: int(64);
         var _nFields: int(32);
 
         pragma "no doc"
@@ -421,6 +421,11 @@ module MySQL {
             this._nFields = 0;
 
             this.complete();
+        }
+
+        // Returns the last error message as a string
+        proc getLastError(): string throws {
+            return createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn));
         }
 
         /*
@@ -452,6 +457,7 @@ module MySQL {
 
             if (mysql_query(this._cptr_mysqlconn, sqlStatement.localize().c_str())) {
                 writeln("[Error] Query execution error.");
+                writeln(createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn)));
                 throw new QueryExecutionError();
             }
             
@@ -467,13 +473,28 @@ module MySQL {
             }
 
             else if ((this._cptr_result == c_nil) && (mysql_errno(this._cptr_mysqlconn) == 0)) {
-                this._nFields = 0;
+                // Result is nil. Should it be? Check using mysql_field_count (as per example in API docs)
+                if (mysql_field_count(this._cptr_mysqlconn) == 0) {
+                    this._nFields = 0;
+                }
+                else {
+                    writeln(createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn)));
+                    throw new QueryExecutionError();
+                }
             }
 
             // If all is fine and there is some result:
-            else if ((this._cptr_result != c_nil) && (mysql_errno(this._cptr_mysqlconn) != 0)) {
+            else if ((this._cptr_result != c_nil) && (mysql_errno(this._cptr_mysqlconn) == 0)) {
                 this._nFields = mysql_num_fields(this._cptr_result): int(32);
                 this._cptr_fields = mysql_fetch_fields(this._cptr_result);
+                
+                this._nRows = mysql_num_rows(this._cptr_result);
+            }
+
+            else {
+                writeln("[Error] Error occurred while storing result.");
+                throw new QueryExecutionError();
+                writeln(createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn)));
             }
         }
 
@@ -510,7 +531,7 @@ module MySQL {
         Fetches the next row of the result set.
         Returns a row whcih gives false on calling isValid() on it.
         */
-        override proc fetchone(): owned MySQLRow {
+        override proc fetchone(): owned MySQLRow? {
             if (this._curRow >= this._nRows) {
                 return new MySQLRow(false);
             }
@@ -522,7 +543,7 @@ module MySQL {
             this._curRow += 1;
 
             // init the row:
-            var _row = new MySQLRow(nextRow, this._cptr_fields);
+            var _row = new MySQLRow(nextRow, this._cptr_fields, true);
             
             return _row;
         }
@@ -535,7 +556,7 @@ module MySQL {
             :args howManyRows: how many rows to return
             :type howManyRows: int(32)
         */
-        override iter fetchsome(howManyRows: int(32)): owned MySQLRow {
+        override iter fetchsome(howManyRows: int(32)): owned MySQLRow? {
             if (howManyRows < 0) {
                 writeln("[Error] MySQLCursor.fetchsome(howManyRows) called with howManyRows < 0");
                 throw new Error();
@@ -545,7 +566,7 @@ module MySQL {
                 var counter = 0;
                 var _row = this.fetchone();
 
-                while (_row.isValid() && counter < this._nRows && counter < howManyRows) {
+                while (_row!.isValid() && counter < this._nRows && counter < howManyRows) {
                     yield _row;
                     _row = this.fetchone();
                     counter += 1;
@@ -556,9 +577,9 @@ module MySQL {
         /*
         Fetches all the (remaining) rows in the result, returning an iterator.
         */
-        override iter fetchall(): owned MySQLRow {
+        override iter fetchall(): owned MySQLRow? {
             var _row = this.fetchone();
-            while (_row.isValid()) {
+            while (_row!.isValid()) {
                 yield _row;
                 _row = this.fetchone();
             }
@@ -569,7 +590,7 @@ module MySQL {
             :arg rowIdx: the row to fetch (starts from 0)
             :type rowIdx: int(32)
         */
-        proc fetchrow(rowIdx: int(32)): owned MySQLRow {
+        proc fetchrow(rowIdx: int(32)): owned MySQLRow? {
             if (rowIdx >= this._nRows) {
                 return nil;
             }
