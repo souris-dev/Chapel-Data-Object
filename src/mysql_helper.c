@@ -5,7 +5,7 @@ const char* __get_mysql_field_val_by_number(MYSQL_ROW row, int idx) {
 }
 
 const char* __get_mysql_field_name_by_number(MYSQL_FIELD *fields, int idx) {
-    return (const char*) fields[i].name;
+    return (const char*) fields[idx].name;
 }
 
 int __get_mysql_field_number_by_name(MYSQL_FIELD *fields, const char* field_name) {

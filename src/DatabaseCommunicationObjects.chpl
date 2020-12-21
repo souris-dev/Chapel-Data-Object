@@ -81,10 +81,10 @@ module DatabaseCommunicationObjects {
     The `?1` and `?2` placeholders can be replaced with setValue.
     Note that there must be atleast one space before
     the placeholder to be recognized as one.
-    Hence, for `SELECT id FROM USERS WHERE name =?1 and address = ?2`
-    `?1` will not be recognized as a placeholder but `?2` will be.
+    Hence, for `SELECT id FROM USERS WHERE name =?1 and address = ?2`,
+    `?1` will not be recognized as a placeholder and `?2` will be.
     */
-    record Statement {
+    class Statement {
         var _statementUnformatted: string;
         var _toSubstitute: bool;
         var _finalStatement: string;
@@ -142,12 +142,18 @@ module DatabaseCommunicationObjects {
         */
 
         proc isPlaceholderRemaining(): bool {
-            // Skip the check if we've previosuly checked that there's none left
+            // TODO: There's a way to further optimize this placeholder checking
+            // by counting the number of placeholders in init and decrementing
+            // the count everytime a value is substituted.
+            // This will allow isPlaceholderRemaining() to execute in O(1)
+            // instead of O(n) each time this function is called.
+
+            // Skip the check if we've previously checked that there's none left
             if (!this._placeholderRemains) {
                 return false;
             }
 
-            // Checks if there is any pattern like: "<space>?<digit>" in the string
+            // Checks if there is any pattern like: "<space>?<digit>" left in the string
             for (i, char) in zip(0.., this._finalStatement) {
                 if (char == "?" && i > 0 && this._finalStatement[i - 1].isSpace()) {
                     if (i < this._finalStatement.size - 1 && this._finalStatement[i + 1].isDigit()) {
@@ -161,12 +167,20 @@ module DatabaseCommunicationObjects {
 
         /*
         Returns the substituted, final SQL statement/query.
+            :arg checkPlaceholders: whether to check if there are any placeholders 
+                                    left to be substituted (true by default)
+            :type checkPlaceholders: bool
+
             :return: final substituted SQL statement/query
             :rtype: string
         */
-        proc getSubstitutedStatement(): string throws {
-            // TODO: Add a check to ensure no placeholders are unsubstituted
-            // If so, warn the user or throw an error.
+        proc getSubstitutedStatement(checkPlaceholders: bool = true): string throws {
+            // If checkPlaceholders is false, the function does not check
+            // if any placeholders are yet to be substituted.
+            // This has been added for flexibility of the user.
+            if (!checkPlaceholders) {
+                return this._finalStatement;
+            }
             if (!this._toSubstitute) {
                 return this._finalStatement;
             }
