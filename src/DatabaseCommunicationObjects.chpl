@@ -177,7 +177,7 @@ module DatabaseCommunicationObjects {
         proc getSubstitutedStatement(checkPlaceholders: bool = true): string throws {
             // If checkPlaceholders is false, the function does not check
             // if any placeholders are yet to be substituted.
-            // This has been added for flexibility of the user.
+            // This has been added for flexibility on the user's end.
             if (!checkPlaceholders) {
                 return this._finalStatement;
             }
