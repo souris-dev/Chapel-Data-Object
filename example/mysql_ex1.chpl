@@ -15,7 +15,7 @@ module Main {
         //var insertStmts = [new Statement("INSERT INTO CONTACTS VALUES (1, 'A');"), new Statement("INSERT INTO CONTACTS VALUES (2, 'B');")];
         //cursor.executeBatch(insertStmts);
 
-        var stmt: Statement = new Statement("SELECT * FROM CONTACT WHERE name = ?1");
+        var stmt: Statement = new Statement("SELECT * FROM CONTACT WHERE name = ?1", true);
         stmt.setValue(1, "B");
         
         cursor.execute(stmt);
