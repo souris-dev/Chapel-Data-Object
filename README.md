@@ -18,14 +18,14 @@ module Main {
     use Map;
 
     proc main() throws {
-        var conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;root;password");
+        var conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;username;password");
         var cursor = conHandler.cursor();
 
         var createStmt = "CREATE TABLE CONTACTS (id INT PRIMARY KEY, name VARCHAR(10));";
         cursor.execute(new Statement(createStmt));
         cursor.execute(new Statement("INSERT INTO CONTACTS VALUES (6, 'B');"));
 
-        var stmt: Statement = new Statement("SELECT * FROM CONTACT WHERE name = ?1", true);
+        var stmt: Statement = new Statement("SELECT * FROM CONTACTS WHERE name = ?1", true);
         stmt.setValue(1, "B");
         
         cursor.execute(stmt);
