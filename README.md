@@ -2,7 +2,7 @@
 Database connector for the Chapel programming language.
 This `mason` package aims to provide database connectivity for some
 relational database management systems. 
-Currently planned is support for MySQL, PostgreSQL and SQLite.
+Currently, support is planned for MySQL, PostgreSQL and SQLite.
 Support for other database management systems can be easily added by
 implementing the required interfaces.
 
