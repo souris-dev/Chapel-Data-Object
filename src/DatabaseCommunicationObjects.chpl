@@ -53,6 +53,7 @@ module DatabaseCommunicationObjects {
     */
     class IConnection {
         proc connect(connectionString: string, autocommit: bool = true) throws {}
+        proc getRequiredConnectionParameters(): string {return nil;}
         proc cursor(): ICursor {return nil;}
         proc close() {}
         proc setAutocommit(autocommit: bool) {}
