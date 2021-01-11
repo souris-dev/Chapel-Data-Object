@@ -19,6 +19,21 @@ module MySQL {
         var _connected: bool;
 
         /*
+        This procedure returns the required parameters for the connection
+        as a ;-separated string.
+        This information is required to parse the TOML config file provided for
+        database connection and find the required parameters in it (the ;-separated
+        parameters will be taken as the 'keys' to be found in the config file).
+        Please ensure that this string is in the same format as the expected connection string.
+
+            :return: the required parameters for the database connection separated by ';', as a string
+            :rtype: string
+        */
+        override proc getRequiredConnectionParameters(): string {
+            return "host;dbname;username;password";
+        }
+
+        /*
         Explicitly connects to a database.
         Connection string format:
         <host>;<database name>;<username>;<password>
