@@ -4,7 +4,7 @@ module Main {
     use MySQL;
 
     proc main() throws {
-        var conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;root;password");
+        var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "../example/dbinfo.toml");
         var cursor = conHandler.cursor();
 
         //var createStmt = "CREATE TABLE BLEH (id INT PRIMARY KEY, name VARCHAR(10));";
