@@ -29,7 +29,7 @@ module MySQL {
             :return: the required parameters for the database connection separated by ';', as a string
             :rtype: string
         */
-        override proc getRequiredConnectionParameters(): string {
+        override proc type getRequiredConnectionParameters(): string {
             return "host;dbname;username;password";
         }
 
@@ -83,6 +83,7 @@ module MySQL {
 
             if (conn_res == c_nil) {
                 writeln("[Error] Unable to connect to database!");
+                writeln(createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn)));
                 mysql_close(this._cptr_mysqlconn);
                 throw new DBConnectionFailedError();
             }
