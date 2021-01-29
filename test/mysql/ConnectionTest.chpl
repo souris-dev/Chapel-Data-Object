@@ -23,8 +23,11 @@ proc configConnectionTest(test: borrowed Test) throws {
     conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml", "root");
     conHandler.close();
 
-    // Invalid file, should throw exception
+    // Invalid file, should throw exception saying file not found
     conHandler = ConnectionHandlerWithConfig(MySQLConnection, "nofile");
+
+    // Invalid file (not TOML), should throw TOML parsing error
+    conHandler = ConnectionHandlerWithConfig(MySQLConnection, "TransactionTest.chpl");
 }
 
 proc testAutocommit(test: borrowed Test) throws {
