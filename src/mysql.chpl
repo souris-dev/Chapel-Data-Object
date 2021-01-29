@@ -252,7 +252,7 @@ module MySQL {
         to `beginTransaction()`).
         */
         override proc rollback() {
-            mysql_commit(this._cptr_mysqlconn);
+            mysql_rollback(this._cptr_mysqlconn);
 
             // If autocommit was enabled previously and is now disabled, enable it
             // TODO: Check if it causes unintended consequences
