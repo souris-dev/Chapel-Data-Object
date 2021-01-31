@@ -8,14 +8,17 @@ module DatabaseCommunicationObjects {
     This class needs to be implemented by all row classes.
     */
     class IRow {
-        // Let's have a JDBC approach here
-        // because we can't have heterogenous types in a map
+        // A single function can't return different types of values
+        // hence the first two methods
         
         proc getValAsType(fieldNumber: int(32), type t) {}
         proc getValAsType(fieldName: string, type t) {}
 
         proc getVal(fieldNumber: int(32)): string {}
         proc getVal(fieldName: string): string {}
+
+        proc getFieldInfo(fieldNumber: int(32)): IField {}
+        proc hasColumnWithName(name: string): bool {}
     }
 
     /*
@@ -43,8 +46,7 @@ module DatabaseCommunicationObjects {
 
         proc __resetFields() {}
         proc __addField() {}
-        proc getFieldInfo(fieldNumberInResult: int(32)): IField {}
-        proc hasColumnWithName(name: string): bool {}
+        proc getFieldsInfo() {}
     }
 
     /*
