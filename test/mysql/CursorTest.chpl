@@ -68,3 +68,12 @@ proc executeBatchTest(test: borrowed Test) {
     cursor.close();
     conHandler.close();
 }
+
+proc getFieldsInfoTest(test: borrowed Test) {
+    var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
+    var cursor = conHandler.cursor();
+
+    cursor.execute("SELECT * FROM sample");
+
+    var fieldInfo1 = cursor.getFieldInfo()
+}
