@@ -267,20 +267,26 @@ module MySQL {
     */
     class MySQLField : IField {
         pragma "no doc"
-        var _fieldNumber: int(32);
+        var _fieldIdx: int(32);
 
         pragma "no doc"
         var _fieldName: string;
 
         pragma "no doc"
-        // TODO: should this be string? Or should we have an enum:
+        // TODO: should this be a string? Or should we have an enum:
         var _fieldType: string;
+
+        proc init(fieldIdx: int(32), fieldName: string, fieldType: string) {
+            this._fieldName = fieldName;
+            this._fieldIdx = fieldIdx;
+            this._fieldType = fieldType;
+        }
 
         override proc getFieldName(): string {
             return this._fieldName;
         }
 
-        override proc getFieldNumber(): int(32) {
+        override proc getFieldIdx(): int(32) {
             return this._fieldNumber;
         }
 
@@ -295,10 +301,10 @@ module MySQL {
     class MySQLRow : IRow {
 
         // Note: the problem here is that we can't use one single function
-        // to return values of different types I guess (can we?)
+        // to return values of different types
         // Because of this, even if we know the field type, we cannot really
         // convert the value to that type and return it
-        // because that would mean returning different types for different fields
+        // because that would mean returning different types from the same function
 
         pragma "no doc"
         var _cptr_row: MYSQL_ROW;
@@ -476,8 +482,6 @@ module MySQL {
                 writeln(createStringWithNewBuffer(mysql_error(this._cptr_mysqlconn)));
                 throw new QueryExecutionError();
             }
-            
-            this.__resetFields();
 
             // TODO: store result or use result?
             this._cptr_result = mysql_store_result(this._cptr_mysqlconn);
@@ -612,11 +616,31 @@ module MySQL {
             }
 
             this._curRow = rowIdx;
-            mysql_data_seel(this._cptr_result, rowIdx: c_int);
+            mysql_data_seek(this._cptr_result, rowIdx: c_int);
 
             var row = this.fetchone();
 
             return row;
+        }
+
+        /*
+        Returns field information given the field number, for the result
+        statement of the last statement.
+            :arg fieldIdx: the field index whose information to return (starts from 0)
+            :type fieldIdx: int(32)
+        */
+        proc getFieldsInfo() {
+            var fields: [0..0] MySQLField;
+
+            for i in 0..(this._nFields - 1) {
+                var fieldName = createStringWithNewBuffer(__get_mysql_field_name_by_number(this._cptr_fields, i));
+                var fieldType = createStringWithNewBuffer(__get_mysql_field_type_by_idx(this._cptr_fields, i));
+                var fieldIdx = i;
+
+                fields.push_back(new MySQLField(fieldIdx, fieldName, fieldType));
+            }
+
+            return fields;
         }
     }
 }
