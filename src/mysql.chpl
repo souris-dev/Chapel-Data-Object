@@ -7,6 +7,30 @@ module MySQL {
     require "stdio.h";
     require "mysql_helper.h";
 
+    enum MySQLFieldType {MYSQL_TYPE_TINY,
+                MYSQL_TYPE_SHORT,
+                MYSQL_TYPE_LONG,
+                MYSQL_TYPE_INT24,
+                MYSQL_TYPE_LONGLONG,
+                MYSQL_TYPE_DECIMAL,
+                MYSQL_TYPE_NEWDECIMAL,
+                MYSQL_TYPE_FLOAT,
+                MYSQL_TYPE_DOUBLE,
+                MYSQL_TYPE_BIT,
+                MYSQL_TYPE_TIMESTAMP,
+                MYSQL_TYPE_DATE,
+                MYSQL_TYPE_TIME,
+                MYSQL_TYPE_DATETIME,
+                MYSQL_TYPE_YEAR,
+                MYSQL_TYPE_STRING,
+                MYSQL_TYPE_VAR_STRING,
+                MYSQL_TYPE_TYPE_BLOB,
+                MYSQL_TYPE_SET,
+                MYSQL_TYPE_ENUM,
+                MYSQL_TYPE_GEOMETRY,
+                MYSQL_TYPE_NULL,
+                UNKNOWN_TYPE}
+
     /*
     Class for a MySQL server connection. 
     Used to keep track of a MySQL server connection.
@@ -273,10 +297,9 @@ module MySQL {
         var _fieldName: string;
 
         pragma "no doc"
-        // TODO: should this be a string? Or should we have an enum:
-        var _fieldType: string;
+        var _fieldType: MySQLFieldType;
 
-        proc init(fieldIdx: int(32), fieldName: string, fieldType: string) {
+        proc init(fieldIdx: int(32), fieldName: string, fieldType: MySQLFieldType) {
             this._fieldName = fieldName;
             this._fieldIdx = fieldIdx;
             this._fieldType = fieldType;
@@ -290,7 +313,7 @@ module MySQL {
             return this._fieldNumber;
         }
 
-        override proc getFieldType(): string {
+        override proc getFieldType(): MySQLFieldType {
             return this._fieldType;
         }
     }
@@ -637,7 +660,14 @@ module MySQL {
                 var fieldType = createStringWithNewBuffer(__get_mysql_field_type_by_idx(this._cptr_fields, i));
                 var fieldIdx = i;
 
-                fields.push_back(new MySQLField(fieldIdx, fieldName, fieldType));
+                var mysqlFieldType: MySQLFieldType;
+                try {
+                    mysqlFieldType = fieldType: MySQLFieldType;
+                }
+                catch e: IllegalArgumentError {
+                    mysqlFieldType = MySQLFieldType.UNKNOWN_TYPE;
+                }
+                fields.push_back(new MySQLField(fieldIdx, fieldName, mysqlFieldType));
             }
 
             return fields;
