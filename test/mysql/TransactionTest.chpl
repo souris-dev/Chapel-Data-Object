@@ -3,7 +3,7 @@ use DatabaseCommunicationObjects;
 use UnitTest;
 use MySQL;
 
-proc simpleTransactionTest(test: borrowed Test) {
+proc simpleTransactionTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
@@ -22,7 +22,7 @@ proc simpleTransactionTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc transactionRollbackTest(test: borrowed Test) {
+proc transactionRollbackTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 

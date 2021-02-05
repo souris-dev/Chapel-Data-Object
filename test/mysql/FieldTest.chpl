@@ -3,7 +3,7 @@ use DatabaseCommunicationObjects;
 use UnitTest;
 use MySQL;
 
-proc fieldTest(test: borrowed Test) {
+proc fieldTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 

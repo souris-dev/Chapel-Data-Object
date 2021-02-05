@@ -3,7 +3,7 @@ use DatabaseCommunicationObjects;
 use UnitTest;
 use MySQL;
 
-proc cursorOpenExecuteTest(test: borrowed Test) {
+proc cursorOpenExecuteTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
@@ -13,7 +13,7 @@ proc cursorOpenExecuteTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc cursorQueryTest(test: borrowed Test) {
+proc cursorQueryTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithCOnfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
@@ -23,7 +23,7 @@ proc cursorQueryTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc fetchoneTest(test: borrowed Test) {
+proc fetchoneTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
@@ -38,13 +38,13 @@ proc fetchoneTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc fetchallTest(test: borrowed Test) {
+proc fetchallTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
     cursor.execute(new Statement("SELECT * FROM sample"));
 
-    for row in cursor.fetchall() {
+    for row in cursor.fetchall() throws {
         writeln(row![0], "\t", row![1]);
         test.assertTrue(row![0].isStringType());
         test.assertTrue(row![1].isStringType());
@@ -55,7 +55,7 @@ proc fetchallTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc executeBatchTest(test: borrowed Test) {
+proc executeBatchTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
@@ -90,7 +90,7 @@ proc executeBatchTest(test: borrowed Test) {
     conHandler.close();
 }
 
-proc getFieldsInfoTest(test: borrowed Test) {
+proc getFieldsInfoTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
