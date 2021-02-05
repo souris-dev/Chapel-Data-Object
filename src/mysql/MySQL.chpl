@@ -7,6 +7,12 @@ module MySQL {
     require "stdio.h";
     require "mysql_helper.h";
 
+    /*
+    Enum that describes the data type held by a field in MySQL.
+    Note: MySQL uses TINYINT(1) internally for the BOOLEAN
+    data type, so BOOLEAN fields are depicted as MYSQL_TYPE_TINY.
+    The field value 1 depicts true and 0 depicts false internally.
+    */
     enum MySQLFieldType {MYSQL_TYPE_TINY,
                 MYSQL_TYPE_SHORT,
                 MYSQL_TYPE_LONG,
