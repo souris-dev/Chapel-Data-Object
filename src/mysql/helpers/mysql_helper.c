@@ -30,7 +30,7 @@ int __get_mysql_field_type_by_idx(MYSQL_FIELD *fields, int idx) {
 
     int fieldType = -1;
 
-    switch (fields[i].type) {
+    switch (fields[idx].type) {
         case MYSQL_TYPE_TINY:
             fieldType = 0;
             break;

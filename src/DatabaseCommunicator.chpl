@@ -8,7 +8,7 @@ module DatabaseCommunicator {
     The configuration information (like username, etc.) are supplied as a TOML file.
     */
     proc ConnectionHandlerWithConfig(type className, configFile: string, tomlFileDbconfigRootElem: string = "dbconfig"): owned ConnectionHandler throws {
-        if (!isSubtype(className, IConnection)) {
+        if (!isSubtype(className, DatabaseCommunicationObjects.Implementables.IConnection)) {
             halt("[Error] The class specified in the constructor of ConnectionHandler should inherit IConnection.");
         }
 
@@ -52,7 +52,7 @@ module DatabaseCommunicator {
         Initializes a connection handler for the given database management system.
         */
         proc init(type className, connectionString: string, autocommit: bool = true) {
-            if (!isSubtype(className, IConnection)) {
+            if (!isSubtype(className, DatabaseCommunicationObjects.Implementables.IConnection)) {
                 halt("[Error] The class specified in the constructor of ConnectionHandler should inherit IConnection.");
             }
 
