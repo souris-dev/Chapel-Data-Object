@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module IRow {
 
     /*
     The base class for a row  of the returned result.

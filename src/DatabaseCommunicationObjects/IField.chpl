@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module IField {
     /*
     The base class for a field of the returned result.
     This class needs to be implemented by all field info classes.

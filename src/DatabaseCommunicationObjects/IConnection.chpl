@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module IConnection {
     /*
     The `IConnection` class provides an interface that needs to be
     implemented by all database connector classes.

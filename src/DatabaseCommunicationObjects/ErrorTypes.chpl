@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module ErrorTypes {
     /*** Errors ***/
 
     /*
