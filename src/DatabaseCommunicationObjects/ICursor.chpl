@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module ICursor {
     /*
     The `ICursor` class provides an interface that needs to be
     implemented by all database cursor classes.

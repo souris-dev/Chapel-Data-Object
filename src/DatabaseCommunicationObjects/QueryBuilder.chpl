@@ -1,4 +1,4 @@
-module DatabaseCommunicationObjects {
+module QueryBuilder {
     /*** Query Building ***/
 
     /* 
