@@ -1,6 +1,7 @@
 module Main {
     use DatabaseCommunicator;
-    use DatabaseCommunicationObjects;
+    use DatabaseCommunicator.DatabaseCommunicationObjects;
+    use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
     use MySQL;
 
     proc main() throws {

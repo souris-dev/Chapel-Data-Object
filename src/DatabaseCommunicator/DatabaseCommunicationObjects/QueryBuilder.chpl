@@ -1,4 +1,6 @@
-module DatabaseCommunicationObjects {
+module QueryBuilder {
+    use super.ErrorTypes;
+
     /*** Query Building ***/
 
     /* 

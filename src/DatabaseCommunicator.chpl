@@ -1,5 +1,5 @@
 module DatabaseCommunicator {
-    use DatabaseCommunicationObjects;
+    include module DatabaseCommunicationObjects;
     use IO;
     use TOML;
 
