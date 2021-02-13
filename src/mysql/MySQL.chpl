@@ -1,5 +1,7 @@
 module MySQL {
-    use DatabaseCommunicationObjects;
+    use DatabaseCommunicator.DatabaseCommunicationObjects.Implementables;
+    use DatabaseCommunicator.DatabaseCommunicationObjects.ErrorTypes;
+    use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
     use CPtr;
     use SysCTypes;
     use MySQLNative;
@@ -306,8 +308,8 @@ module MySQL {
         var _fieldType: MySQLFieldType;
 
         proc init(fieldIdx: int(32), fieldName: string, fieldType: MySQLFieldType) {
-            this._fieldName = fieldName;
             this._fieldIdx = fieldIdx;
+            this._fieldName = fieldName;
             this._fieldType = fieldType;
         }
 
