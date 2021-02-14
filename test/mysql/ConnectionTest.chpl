@@ -73,7 +73,7 @@ proc testAutocommit(test: borrowed Test) throws {
 
     conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;root;password", false);
     test.assertFalse(conHandler.isAutocommit());
-    conHandler.setAutcommit(true);
+    conHandler.setAutocommit(true);
     test.assertTrue(conHandler.isAutocommit());
     conHandler.close();
 }
