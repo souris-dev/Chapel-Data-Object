@@ -13,9 +13,8 @@ implementing the required interfaces.
 ```chapel
 module Main {
     use DatabaseCommunicator;
-    use DatabaseCommunicationObjects; // for Statement class
+    use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder; // for Statement class
     use MySQL;
-    use Map;
 
     proc main() throws {
         var conHandler = new ConnectionHandler(MySQLConnection, "localhost;testdb;username;password");
