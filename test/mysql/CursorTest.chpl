@@ -1,5 +1,5 @@
 use DatabaseCommunicator;
-use DatabaseCommunicationObjects;
+use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
 use UnitTest;
 use MySQL;
 
@@ -44,7 +44,7 @@ proc fetchallTest(test: borrowed Test) throws {
 
     cursor.execute(new Statement("SELECT * FROM sample"));
 
-    for row in cursor.fetchall() throws {
+    for row in cursor.fetchall() {
         writeln(row![0], "\t", row![1]);
         test.assertTrue(row![0].isStringType());
         test.assertTrue(row![1].isStringType());
@@ -65,7 +65,7 @@ proc executeBatchTest(test: borrowed Test) throws {
     
     //ensure autocommit is on
     test.assertTrue(conHandler.isAutocommit());
-    cursor.executeBatch(insertStatement);
+    cursor.executeBatch(insertStatements);
 
     // ensure autocommit is on
     test.assertTrue(conHandler.isAutocommit());
@@ -112,3 +112,5 @@ proc getFieldsInfoTest(test: borrowed Test) throws {
     cursor.close();
     conHandler.close();
 }
+
+UnitTest.main();

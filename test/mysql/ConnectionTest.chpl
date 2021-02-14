@@ -1,5 +1,5 @@
 use DatabaseCommunicator;
-use DatabaseCommunicationObjects;
+use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
 use UnitTest;
 use MySQL;
 
@@ -56,7 +56,7 @@ proc testAutocommit(test: borrowed Test) throws {
     // config file in this specifies autocommit as false
     conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig_autoc_false.toml");
     test.assertFalse(conHandler.isAutocommit());
-    conHandler.setAutcommit(true);
+    conHandler.setAutocommit(true);
     test.assertTrue(conHandler.isAutocommit());
     conHandler.close();
 
@@ -80,3 +80,5 @@ proc testAutocommit(test: borrowed Test) throws {
 
 // Tests for other methods are located appropriately
 // TODO: replace "appropriately" in above line with proper locations
+
+UnitTest.main();

@@ -1,5 +1,5 @@
 use DatabaseCommunicator;
-use DatabaseCommunicationObjects;
+use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
 use UnitTest;
 use MySQL;
 
@@ -25,3 +25,5 @@ proc fieldTest(test: borrowed Test) throws {
     cursor.close();
     conHandler.close();
 }
+
+UnitTest.main();
