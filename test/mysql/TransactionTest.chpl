@@ -1,5 +1,5 @@
 use DatabaseCommunicator;
-use DatabaseCommunicationObjects;
+use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
 use UnitTest;
 use MySQL;
 
@@ -29,7 +29,7 @@ proc transactionRollbackTest(test: borrowed Test) throws {
     test.assertTrue(conHandler.isAutocommit());
 
     conHandler.beginTransaction();
-    test.assertFalse(conHander.isAutocommit());
+    test.assertFalse(conHandler.isAutocommit());
 
     cursor.execute(new Statement("INSERT INTO sample VALUES (20, 'Sample', true)"));
     cursor.execute(new Statement("INSERT INTO sample VALUES (21, 'Sample2', true)"));
@@ -40,3 +40,5 @@ proc transactionRollbackTest(test: borrowed Test) throws {
     cursor.close();
     conHandler.close();
 }
+
+UnitTest.main();

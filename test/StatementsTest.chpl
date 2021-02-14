@@ -1,5 +1,5 @@
 use UnitTest;
-use DatabaseCommunicationObjects;
+use DatabaseCommunicator.DatabaseCommunicationObjects.QueryBuilder;
 
 proc statementTest1(test: borrowed Test) throws {
     var st1: Statement = new Statement("SELECT * FROM CONTACTS;");
