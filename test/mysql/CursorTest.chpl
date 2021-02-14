@@ -14,7 +14,7 @@ proc cursorOpenExecuteTest(test: borrowed Test) throws {
 }
 
 proc cursorQueryTest(test: borrowed Test) throws {
-    var conHandler = ConnectionHandlerWithCOnfig(MySQLConnection, "dbconfig.toml");
+    var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
     cursor.query(new Statement("SELECT * FROM sample"));
