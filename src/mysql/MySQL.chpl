@@ -555,8 +555,8 @@ module MySQL {
             :arg statements: an array of :class:`Statement` objects to be executed
             :type statements: array of :class:`Statement` objects
         */
-        override proc executeBatch(statements: [?D] Statement) {
-            this.beginTransaction();
+        override proc executeBatch(statements: [] owned Statement) throws {
+            this._connection.beginTransaction();
             var hasError: bool = false;
 
             // TODO: memory management
@@ -566,7 +566,7 @@ module MySQL {
                 }
                 catch err: QueryExecutionError {
                     hasError = true;
-                    this.rollback();
+                    this._connection.rollback();
 
                     // re-throw the query execution error
                     throw new QueryExecutionError();
@@ -574,7 +574,7 @@ module MySQL {
             }
 
             if (!hasError) {
-                this.commit();
+                this._connection.commit();
             }
         }
 

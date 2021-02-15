@@ -29,7 +29,7 @@ module Implementables {
     */
     class ICursor {
         proc execute(statement: Statement) throws {}
-        proc executeBatch(statements: [?D] Statement) {}
+        proc executeBatch(statements: [] owned Statement) {}
         proc query(statement: Statement) {}
         proc fetchone() {}
         iter fetchsome(howManyRows: int(32)) {}
