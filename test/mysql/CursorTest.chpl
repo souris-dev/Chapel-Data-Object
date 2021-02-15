@@ -30,9 +30,9 @@ proc fetchoneTest(test: borrowed Test) throws {
     cursor.execute(new Statement("SELECT * FROM sample"));
     var row = cursor.fetchone();
 
-    test.assertTrue(row![0].isStringType());
-    test.assertTrue(row![1].isStringType());
-    test.assertTrue(row![2].isStringType());
+    test.assertTrue(isString(row![0]));
+    test.assertTrue(isString(row![1]));
+    test.assertTrue(isString(row![2]));
 
     cursor.close();
     conHandler.close();
@@ -46,9 +46,9 @@ proc fetchallTest(test: borrowed Test) throws {
 
     for row in cursor.fetchall() {
         writeln(row![0], "\t", row![1]);
-        test.assertTrue(row![0].isStringType());
-        test.assertTrue(row![1].isStringType());
-        test.assertTrue(row![2].isStringType());
+        test.assertTrue(isString(row![0]));
+        test.assertTrue(isString(row![1]));
+        test.assertTrue(isString(row![2]));
     }
 
     cursor.close();
