@@ -38,7 +38,7 @@ module Implementables {
 
         proc __resetFields() {}
         proc __addField() {}
-        proc getFieldsInfo() {}
+        iter getFieldsInfo() {}
     }
 
     /*

@@ -7,20 +7,29 @@ proc fieldTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
-    cursor.execute("SELECT * FROM sample");
+    cursor.execute(new Statement("SELECT * FROM sample"));
 
-    var fieldInfo1 = cursor.getFieldsInfo();
-    test.assertTrue(fieldInfo[0].getFieldIdx() == 0);
-    test.assertTrue(fieldInfo[0].getFieldName() == "Field1");
-    test.assertTrue(fieldInfo[0].getFieldType() == MySQLFieldType.MYSQL_TYPE_LONG);
+    for (i, fieldInfo) in zip(0.., cursor.getFieldsInfo()) {
+        select i {
+            when 0 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 0);
+                test.assertTrue(fieldInfo.getFieldName() == "Field1");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_LONG);
+            }
 
-    test.assertTrue(fieldInfo[1].getFieldIdx() == 1);
-    test.assertTrue(fieldInfo[1].getFieldName() == "Field2");
-    test.assertTrue(fieldInfo[1].getFieldType() == MySQLFieldType.MYSQL_TYPE_STRING);
+            when 1 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 1);
+                test.assertTrue(fieldInfo.getFieldName() == "Field2");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_VAR_STRING);
+            }
 
-    test.assertTrue(fieldInfo[2].getFieldIdx() == 2);
-    test.assertTrue(fieldInfo[2].getFieldName() == "Field3");
-    test.assertTrue(fieldInfo[2].getFieldType() == MySQLFieldType.MYSQL_TYPE_TINYINT);
+            when 2 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 2);
+                test.assertTrue(fieldInfo.getFieldName() == "Field3");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_TINY);
+            }
+        }
+    }
 
     cursor.close();
     conHandler.close();

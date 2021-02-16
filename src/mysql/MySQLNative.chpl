@@ -574,4 +574,7 @@ module MySQLNative {
 
     pragma "no doc"
     extern proc __get_mysql_field_val_by_name(in row: MYSQL_ROW, fields: c_ptr(MYSQL_FIELD), fieldName: c_string): c_string;
+
+    pragma "no doc"
+    extern proc __get_mysql_field_type_by_idx(fields: c_ptr(MYSQL_FIELD), idx: c_int): int(32);
 } // MySQLNative
