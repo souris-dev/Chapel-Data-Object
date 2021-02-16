@@ -7,7 +7,7 @@ cd ../..
 
 echo "[Info] Making tests..."
 make tests
-cp ./test/mysql/configs/*.toml ./bin
+cp -f ./test/mysql/configs/*.toml ./bin
 cd ./bin
 
 # start mysql server if not yet started

@@ -15,29 +15,29 @@ module MySQL {
     data type, so BOOLEAN fields are depicted as MYSQL_TYPE_TINY.
     The field value 1 depicts true and 0 depicts false internally.
     */
-    enum MySQLFieldType {MYSQL_TYPE_TINY,
-                MYSQL_TYPE_SHORT,
-                MYSQL_TYPE_LONG,
-                MYSQL_TYPE_INT24,
-                MYSQL_TYPE_LONGLONG,
-                MYSQL_TYPE_DECIMAL,
-                MYSQL_TYPE_NEWDECIMAL,
-                MYSQL_TYPE_FLOAT,
-                MYSQL_TYPE_DOUBLE,
-                MYSQL_TYPE_BIT,
-                MYSQL_TYPE_TIMESTAMP,
-                MYSQL_TYPE_DATE,
-                MYSQL_TYPE_TIME,
-                MYSQL_TYPE_DATETIME,
-                MYSQL_TYPE_YEAR,
-                MYSQL_TYPE_STRING,
-                MYSQL_TYPE_VAR_STRING,
-                MYSQL_TYPE_TYPE_BLOB,
-                MYSQL_TYPE_SET,
-                MYSQL_TYPE_ENUM,
-                MYSQL_TYPE_GEOMETRY,
-                MYSQL_TYPE_NULL,
-                UNKNOWN_TYPE}
+    enum MySQLFieldType {MYSQL_TYPE_TINY = 0,
+                MYSQL_TYPE_SHORT = 1,
+                MYSQL_TYPE_LONG = 2,
+                MYSQL_TYPE_INT24 = 3,
+                MYSQL_TYPE_LONGLONG = 4,
+                MYSQL_TYPE_DECIMAL = 5,
+                MYSQL_TYPE_NEWDECIMAL = 6,
+                MYSQL_TYPE_FLOAT = 7,
+                MYSQL_TYPE_DOUBLE = 8,
+                MYSQL_TYPE_BIT = 9,
+                MYSQL_TYPE_TIMESTAMP = 10,
+                MYSQL_TYPE_DATE = 11,
+                MYSQL_TYPE_TIME = 12,
+                MYSQL_TYPE_DATETIME = 13,
+                MYSQL_TYPE_YEAR = 14,
+                MYSQL_TYPE_STRING = 15,
+                MYSQL_TYPE_VAR_STRING = 16,
+                MYSQL_TYPE_TYPE_BLOB = 17,
+                MYSQL_TYPE_SET = 18,
+                MYSQL_TYPE_ENUM = 19,
+                MYSQL_TYPE_GEOMETRY = 20,
+                MYSQL_TYPE_NULL = 21,
+                UNKNOWN_TYPE = 22}
 
     /*
     Class for a MySQL server connection. 
@@ -318,7 +318,7 @@ module MySQL {
         }
 
         override proc getFieldIdx(): int(32) {
-            return this._fieldNumber;
+            return this._fieldIdx;
         }
 
         override proc getFieldType(): MySQLFieldType {
@@ -655,17 +655,12 @@ module MySQL {
         }
 
         /*
-        Returns field information given the field number, for the result
-        statement of the last statement.
-            :arg fieldIdx: the field index whose information to return (starts from 0)
-            :type fieldIdx: int(32)
+        Returns information about the fields, iterating over the fields.
         */
-        proc getFieldsInfo() {
-            var fields: [0..0] MySQLField;
-
+        override iter getFieldsInfo() throws {
             for i in 0..(this._nFields - 1) {
                 var fieldName = createStringWithNewBuffer(__get_mysql_field_name_by_number(this._cptr_fields, i));
-                var fieldType = createStringWithNewBuffer(__get_mysql_field_type_by_idx(this._cptr_fields, i));
+                var fieldType = __get_mysql_field_type_by_idx(this._cptr_fields, i);
                 var fieldIdx = i;
 
                 var mysqlFieldType: MySQLFieldType;
@@ -675,10 +670,8 @@ module MySQL {
                 catch e: IllegalArgumentError {
                     mysqlFieldType = MySQLFieldType.UNKNOWN_TYPE;
                 }
-                fields.push_back(new MySQLField(fieldIdx, fieldName, mysqlFieldType));
+                yield new MySQLField(fieldIdx, fieldName, mysqlFieldType);
             }
-
-            return fields;
         }
     }
 }

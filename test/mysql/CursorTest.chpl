@@ -61,7 +61,7 @@ proc executeBatchTest(test: borrowed Test) throws {
 
     var insertStatements = [new Statement("INSERT INTO sample VALUES (31, 'Person1', true)"),
                             new Statement("INSERT INTO sample VALUES (32, 'Person2', true)"),
-                            new Statement("INSERT INTO sample VALUES (33, 'Person3', true)")];
+                            new Statement("INSERT INTO sample VALUES (33, 'Person3', false)")];
     
     //ensure autocommit is on
     test.assertTrue(conHandler.isAutocommit());
@@ -72,19 +72,19 @@ proc executeBatchTest(test: borrowed Test) throws {
     cursor.execute(new Statement("SELECT * from sample WHERE Field1 IN (31, 32, 33)"));
 
     var row1 = cursor.fetchone();
-    test.assertTrue(row1![0] == '31');
-    test.assertTrue(row1![1] == 'Person1');
-    test.assertTrue(row1![2] == 'true');
+    test.assertTrue(row1![0] == "31");
+    test.assertTrue(row1![1] == "Person1");
+    test.assertTrue(row1![2] == "1");
 
     var row2 = cursor.fetchone();
-    test.assertTrue(row2![0] == '32');
-    test.assertTrue(row2![1] == 'Person2');
-    test.assertTrue(row2![2] == 'true');
+    test.assertTrue(row2![0] == "32");
+    test.assertTrue(row2![1] == "Person2");
+    test.assertTrue(row2![2] == "1");
 
     var row3 = cursor.fetchone();
-    test.assertTrue(row3![0] == '31');
-    test.assertTrue(row3![1] == 'Person3');
-    test.assertTrue(row3![2] == 'true');
+    test.assertTrue(row3![0] == "33");
+    test.assertTrue(row3![1] == "Person3");
+    test.assertTrue(row3![2] == "0");
 
     cursor.close();
     conHandler.close();
@@ -94,20 +94,29 @@ proc getFieldsInfoTest(test: borrowed Test) throws {
     var conHandler = ConnectionHandlerWithConfig(MySQLConnection, "dbconfig.toml");
     var cursor = conHandler.cursor();
 
-    cursor.execute("SELECT * FROM sample");
+    cursor.execute(new Statement("SELECT * FROM sample"));
 
-    var fieldInfo1 = cursor.getFieldsInfo();
-    test.assertTrue(fieldInfo[0].getFieldIdx() == 0);
-    test.assertTrue(fieldInfo[0].getFieldName() == "Field1");
-    test.assertTrue(fieldInfo[0].getFieldType() == MySQLFieldType.MYSQL_TYPE_LONG);
+    for (i, fieldInfo) in zip(0.., cursor.getFieldsInfo()) {
+        select i {
+            when 0 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 0);
+                test.assertTrue(fieldInfo.getFieldName() == "Field1");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_LONG);
+            }
 
-    test.assertTrue(fieldInfo[1].getFieldIdx() == 1);
-    test.assertTrue(fieldInfo[1].getFieldName() == "Field2");
-    test.assertTrue(fieldInfo[1].getFieldType() == MySQLFieldType.MYSQL_TYPE_STRING);
+            when 1 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 1);
+                test.assertTrue(fieldInfo.getFieldName() == "Field2");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_VAR_STRING);
+            }
 
-    test.assertTrue(fieldInfo[2].getFieldIdx() == 2);
-    test.assertTrue(fieldInfo[2].getFieldName() == "Field3");
-    test.assertTrue(fieldInfo[2].getFieldType() == MySQLFieldType.MYSQL_TYPE_TINYINT);
+            when 2 do {
+                test.assertTrue(fieldInfo.getFieldIdx() == 2);
+                test.assertTrue(fieldInfo.getFieldName() == "Field3");
+                test.assertTrue(fieldInfo.getFieldType() == MySQLFieldType.MYSQL_TYPE_TINY);
+            }
+        }
+    }
 
     cursor.close();
     conHandler.close();
