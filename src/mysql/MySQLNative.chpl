@@ -1,6 +1,9 @@
 module MySQLNative {
     use SysCTypes;
     use CPtr;
+    require "mysql.h";
+    require "stdio.h";
+    require "helpers/mysql_helper.h", "helpers/mysql_helper.c";
 
     extern type char = int(8);
 

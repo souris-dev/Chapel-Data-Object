@@ -7,7 +7,7 @@ module MySQL {
     use MySQLNative;
     require "mysql.h";
     require "stdio.h";
-    require "helpers/mysql_helper.h";
+    require "helpers/mysql_helper.h", "helpers/mysql_helper.c";
 
     /*
     Enum that describes the data type held by a field in MySQL.
