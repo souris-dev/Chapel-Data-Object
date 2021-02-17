@@ -122,4 +122,4 @@ proc getFieldsInfoTest(test: borrowed Test) throws {
     conHandler.close();
 }
 
-sUnitTest.main();
+UnitTest.main();
