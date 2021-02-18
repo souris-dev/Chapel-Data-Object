@@ -626,7 +626,7 @@ module MySQL {
         }
 
         /*
-        Fetches all the (remaining) rows in the result, returning an iterator.
+        Iterates over all the (remaining) rows in the result.
         */
         override iter fetchall(): owned MySQLRow? {
             var _row = this.fetchone();
