@@ -584,7 +584,7 @@ module MySQL {
         */
         override proc fetchone(): owned MySQLRow? {
             if (this._curRow >= this._nRows) {
-                return new MySQLRow(false);
+                return nil;
             }
 
             var nextRow: MYSQL_ROW = mysql_fetch_row(this._cptr_result);
@@ -617,7 +617,7 @@ module MySQL {
                 var counter = 0;
                 var _row = this.fetchone();
 
-                while (_row!.isValid() && counter < this._nRows && counter < howManyRows) {
+                while (_row != nil && counter < this._nRows && counter < howManyRows) {
                     yield _row;
                     _row = this.fetchone();
                     counter += 1;
@@ -630,7 +630,7 @@ module MySQL {
         */
         override iter fetchall(): owned MySQLRow? {
             var _row = this.fetchone();
-            while (_row!.isValid()) {
+            while (_row != nil) {
                 yield _row;
                 _row = this.fetchone();
             }
